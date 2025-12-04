@@ -21,5 +21,6 @@ AWS hesabında "unutulmuş" ve maliyet oluşturan kullanılmayan (Available duru
 
 1. Projeyi bilgisayarınıza indirin:
    ```bash
-   git clone [https://github.com/KULLANICI_ADINIZ/aws-zombie-hunter.git](https://github.com/KULLANICI_ADINIZ/aws-zombie-hunter.git)
+   git clone [https://github.com/emredogan-cloud/aws-zombie-hunter.git](https://github.com/emredogan-cloud/aws-zombie-hunter.git)
+
    cd aws-zombie-hunter
