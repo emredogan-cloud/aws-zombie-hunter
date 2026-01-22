@@ -4,35 +4,30 @@ import logging
 import csv
 from dotenv import load_dotenv
 
-# Loglama ayarları (Ekrana renkli ve tarihli bilgi basar)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class AWSResourceManager:
     def __init__(self):
-        # 1. Ortam değişkenlerini yükle
         load_dotenv()
         
-        # 2. Şifreleri çek
         self.aws_access_key = os.getenv("AWS_ACCESS_KEY")
         self.aws_secret_key = os.getenv("AWS_SECRET_KEY")
         self.region = os.getenv("REGION")
 
         try:
-            # 3. AWS Bağlantısını Kur
             self.ec2 = boto3.client(
                 'ec2',
                 aws_access_key_id=self.aws_access_key,
                 aws_secret_access_key=self.aws_secret_key,
                 region_name=self.region
             )
-            logging.info("AWS bağlantısı başarıyla kuruldu! 🚀")
+            logging.info("AWS connection established successfully.")
 
         except Exception as e:
-            logging.error(f"Bağlantı hatası: {e}")
+            logging.error(f"Connection error: {e}")
 
     def get_zombie_volumes(self) -> list:
-        """Kullanılmayan (Available) durumdaki diskleri bulur."""
-        logging.info("Sahipsiz diskler aranıyor...")
+        logging.info("Scanning for unattached (available) volumes...")
         try:
             response = self.ec2.describe_volumes(
                 Filters=[
@@ -42,49 +37,44 @@ class AWSResourceManager:
                     }
                 ]
             )
-            diskler = response['Volumes']
-            logging.info(f"Tarama bitti. Bulunan sahipsiz disk sayısı: {len(diskler)}")
-            return diskler
+            volumes = response['Volumes']
+            logging.info(f"Scan complete. Found {len(volumes)} unattached volumes.")
+            return volumes
 
         except Exception as e:
-            logging.error(f"Diskler listelenemedi: {e}")
+            logging.error(f"Failed to list volumes: {e}")
             return []
 
-    def save_to_csv(self, volumes : list) -> None:
-        """Disk listesini CSV dosyasına kaydeder."""
-        dosya_adi = 'zombie_diskler.csv'
-        basliklar = ['VolumeId', 'Size', 'CreateTime', 'AvailabilityZone']
+    def save_to_csv(self, volumes: list) -> None:
+        filename = 'zombie_volumes.csv'
+        headers = ['VolumeId', 'Size', 'CreateTime', 'AvailabilityZone']
 
         try:
-            with open(dosya_adi, 'w', newline='', encoding='utf-8') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=basliklar)
+            with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=headers)
                 writer.writeheader()
 
                 for vol in volumes:
-                    satir = {
+                    row = {
                         'VolumeId': vol['VolumeId'],
                         'Size': vol['Size'],
                         'CreateTime': vol['CreateTime'],
                         'AvailabilityZone': vol['AvailabilityZone']
                     }
-                    writer.writerow(satir)
+                    writer.writerow(row)
             
-            logging.info(f"✅ Rapor başarıyla kaydedildi: {dosya_adi}")
-            print(f"\nDosya konumu: {os.getcwd()}/{dosya_adi}")
+            logging.info(f"Report successfully saved: {filename}")
+            print(f"\nFile path: {os.path.join(os.getcwd(), filename)}")
 
         except Exception as e:
-            logging.error(f"CSV hatası: {e}")
+            logging.error(f"CSV error: {e}")
 
-# --- ANA ÇALIŞTIRMA BLOĞU ---
 if __name__ == "__main__":
-    # Nesneyi oluştur
     bot = AWSResourceManager()
     
-    # Diskleri bul
-    diskler = bot.get_zombie_volumes()
+    volumes = bot.get_zombie_volumes()
     
-    # Varsa kaydet
-    if diskler:
-        bot.save_to_csv(diskler)
+    if volumes:
+        bot.save_to_csv(volumes)
     else:
-        logging.info("Sistem temiz, kaydedilecek disk yok.")
+        logging.info("System is clean. No orphan volumes to save.")
