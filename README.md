@@ -1,5 +1,10 @@
 AWS Zombie Resource Hunter
 
+## Architecture Diagram
+
+![Architecture](docs/ZombieHunter.png)
+
+
 An automation tool designed to automatically detect and report "forgotten," cost-incurring, and unused (Available state) EBS volumes within an AWS account.
 🚀 Features
 
