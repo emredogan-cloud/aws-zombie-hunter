@@ -1,5 +1,7 @@
 # AWS Zombie Resource Hunter
 
+![CI Status](https://github.com/emredogan-cloud/aws-zombie-hunter/actions/workflows/ci.yml/badge.svg)
+
 ## Architecture Diagram
 
 ![Architecture](docs/ZombieHunter.png)
