@@ -1,6 +1,7 @@
 # AWS Zombie Resource Hunter
 
-![CI Status](https://github.com/emredogan-cloud/cloud-janitor-ebs-scan/actions/workflows/main.yaml/badge.svg)
+
+[![aws-zombie-hunter CI](https://github.com/emredogan-cloud/aws-zombie-hunter/actions/workflows/main.yaml/badge.svg)](https://github.com/emredogan-cloud/aws-zombie-hunter/actions/workflows/main.yaml)
 
 ## Architecture Diagram
 
