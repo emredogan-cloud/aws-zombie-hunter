@@ -2,6 +2,10 @@
 
 [![aws-zombie-hunter CI](https://github.com/emredogan-cloud/aws-zombie-hunter/actions/workflows/main.yaml/badge.svg)](https://github.com/emredogan-cloud/aws-zombie-hunter/actions/workflows/main.yaml)
 
+## Architecture Diagram
+
+![Architecture](docs/ZombieHunter.png)
+
 Detect and report **forgotten EBS volumes** that waste money. Scans all AWS regions in parallel using boto3 and paginators.
 
 ---
@@ -51,6 +55,39 @@ cat zombie_volumes.csv
 grep "Total Wasted Storage" zombie_volumes.csv
 ```
 
+
+### 🐳 Docker (Containerized)
+
+Prefer a reproducible runtime (no local Python dependency headaches)? You can run **AWS Zombie Hunter** as a Docker container.
+
+#### Build image
+
+```bash
+docker build -t aws-zombie-hunter .
+```
+
+#### Run (recommended: persist reports to your current folder)
+
+```bash
+# Uses credentials from .env (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_REGION)
+# and writes outputs (zombie_volumes.csv + optional JSON) to the current directory.
+docker run --rm \
+  --env-file .env \
+  -v "$PWD:/app" \
+  aws-zombie-hunter --json-output
+```
+
+#### Run using your AWS CLI profile (~/.aws)
+
+```bash
+docker run --rm \
+  -v "$HOME/.aws:/home/zombie/.aws:ro" \
+  -v "$PWD:/app" \
+  aws-zombie-hunter --regions us-east-1 eu-west-1 --workers 10
+```
+
+> Tip: Any arguments you pass after the image name are forwarded to `main.py` (the image uses `ENTRYPOINT ["python", "main.py"]`).
+
 ---
 
 ## 🚀 Features
@@ -62,6 +99,7 @@ grep "Total Wasted Storage" zombie_volumes.csv
 - **Dual Export** — CSV and JSON reports
 - **Secure** — Credentials in `.env`, no hardcoding
 - **Thread-Safe** — Thread-aware logging and error handling
+- **Dockerized Runtime** — Multi-stage image + non-root user for a consistent, secure run
 
 ---
 
@@ -168,6 +206,7 @@ This tool helps identify and eliminate these costs.
 - boto3 (AWS SDK)
 - concurrent.futures (parallel execution)
 - python-dotenv (credential management)
+- Docker (containerized runtime)
 
 ---
 
